@@ -1,0 +1,631 @@
+    #map.crosshair-cursor {
+      cursor: crosshair;
+    }
+    
+    #locateBtn:disabled {
+      cursor: not-allowed;
+    }
+    
+    #locateBtn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .slide-up {
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      min-width: 300px;
+      animation: slideInRight 0.3s ease-out;
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .storage-warning {
+      background: linear-gradient(45deg, #10b981, #3b82f6);
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .image-preview {
+      max-width: 100px;
+      max-height: 100px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 2px solid #e5e7eb;
+      position: relative;
+      background: #f9fafb;
+    }
+
+    .image-preview-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .image-remove-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ef4444;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .memory-image {
+      max-width: 200px;
+      max-height: 150px;
+      object-fit: contain;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    .memory-image:hover {
+      transform: scale(1.05);
+    }
+
+    .privacy-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .privacy-public {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .privacy-private {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .like-button {
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+    }
+
+    .like-button:hover {
+      background: #f3f4f6;
+      transform: scale(1.05);
+    }
+
+    .like-button.liked {
+      color: #ef4444;
+    }
+
+    .like-button.liked:hover {
+      background: #fef2f2;
+    }
+
+    .like-animation {
+      animation: likeHeartBeat 0.6s ease-in-out;
+    }
+
+    @keyframes likeHeartBeat {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.3); }
+      50% { transform: scale(1.1); }
+      75% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .like-count-animation {
+      animation: likeCountPop 0.4s ease-out;
+    }
+
+    @keyframes likeCountPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .number-change {
+      position: relative;
+      display: inline-block;
+    }
+
+    .number-change .old-number {
+      position: absolute;
+      animation: numberFadeOut 0.3s ease-out forwards;
+    }
+
+    .number-change .new-number {
+      animation: numberFadeIn 0.3s ease-out forwards;
+    }
+
+    @keyframes numberFadeOut {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-10px); }
+    }
+
+    @keyframes numberFadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .image-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .image-gallery img {
+      width: 100%;
+      min-height: 80px;
+      max-height: 120px;
+      object-fit: contain;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    .image-gallery img:hover {
+      transform: scale(1.05);
+    }
+
+    .info-window-image {
+      width: 100%;
+      max-width: 60px;
+      height: auto;
+      min-height: 40px;
+      max-height: 60px;
+      object-fit: contain;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    .info-window-gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      margin: 8px 0;
+    }
+
+    .detail-image-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .detail-image-gallery img {
+      width: 100%;
+      height: auto;
+      min-height: 100px;
+      max-height: 200px;
+      object-fit: contain;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .detail-image-gallery img:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .image-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .image-modal img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+    }
+
+    .storage-status {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .map-control-btn {
+      display: block;
+      width: 100%;
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      background: white;
+      border: none;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      color: #374151;
+      text-align: center;
+    }
+
+    .map-control-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background: #f9fafb;
+    }
+
+    .map-control-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none;
+    }
+
+    .map-control-btn.active {
+      background: #3B82F6;
+      color: white;
+    }
+
+    .map-control-btn.active:hover {
+      background: #2563EB;
+    }
+
+    .map-controls {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 1000;
+      width: 140px;
+    }
+
+    .map-mode-selector {
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .map-mode-btn {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      background: white;
+      border: none;
+      border-bottom: 1px solid #e5e7eb;
+      cursor: pointer;
+      font-size: 12px;
+      text-align: left;
+      transition: background 0.2s ease;
+      color: #374151;
+    }
+
+    .map-mode-btn:last-child {
+      border-bottom: none;
+    }
+
+    .map-mode-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .map-mode-btn.active {
+      background: #3B82F6;
+      color: white;
+    }
+
+    .map-mode-btn.active:hover {
+      background: #2563EB;
+    }
+
+    .new-marker-pulse {
+      animation: markerPulse 2s ease-in-out 3;
+    }
+
+    @keyframes markerPulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .loading {
+      display: inline-block;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .offline-indicator {
+      background: linear-gradient(45deg, #f59e0b, #ef4444);
+      color: white;
+      padding: 8px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    /* 词云容器 */
+#wordcloudContainer {
+  height: 600px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 0;
+}
+
+.wordcloud-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-origin: center center;
+  transition: transform 0.2s ease-out;
+}
+
+#wordCloudCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 控制按钮 */
+.wordcloud-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.wordcloud-controls button {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wordcloud-controls button:hover {
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.wordcloud-controls .reset-view {
+  background: rgba(59, 130, 246, 0.9);
+  color: white;
+}
+
+/* 情绪按钮样式 */
+.emotion-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid #d1d5db;
+  background-color: #ffffff;
+  min-height: 60px;
+}
+
+.emotion-btn:hover {
+  border-color: #3b82f6;
+  background-color: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.emotion-btn:active {
+  transform: translateY(0);
+}
+
+/* 选中状态样式 - 重要：确保这些样式优先级足够高 */
+.emotion-btn.bg-blue-200 {
+  background-color: #dbeafe !important;
+  border-color: #3b82f6 !important;
+}
+
+.emotion-btn.border-blue-500 {
+  border-color: #3b82f6 !important;
+}
+
+.emotion-btn.ring-2 {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* 选中状态的组合样式 */
+.emotion-btn.bg-blue-200.border-blue-500 {
+  background-color: #dbeafe !important;
+  border-color: #3b82f6 !important;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.emotion-btn.bg-blue-200.border-blue-500.ring-2 {
+  background-color: #dbeafe !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5) !important;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+/* 选中状态的悬停效果 */
+.emotion-btn.bg-blue-200:hover,
+.emotion-btn.border-blue-500:hover {
+  background-color: #bfdbfe !important;
+  border-color: #2563eb !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 确保表情符号和文本的样式 */
+.emotion-btn span {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  margin-top: 2px;
+}
+
+/* 防止选中文本 */
+.emotion-btn {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* 焦点状态 */
+.emotion-btn:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: rgba(59, 130, 246, 0.5);
+  ring-offset: 2px;
+}
+
+/* 调试样式 - 临时添加，帮助查看选中状态 */
+.emotion-btn[data-debug-selected="true"] {
+  background-color: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+/* 时间回溯新增样式 */
+.new-timeline-marker {
+  position: relative;
+  z-index: 1000;
+}
+
+.new-timeline-marker span {
+  animation: timelineMarkerPulse 1s ease-in-out;
+}
+
+@keyframes timelineMarkerPulse {
+  0% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: scale(1.3); 
+    opacity: 0.8; 
+  }
+  100% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+}
+
+/* 播放控件样式增强 */
+#playbackSpeed {
+  transition: all 0.2s ease;
+}
+
+#playbackSpeed:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+#playbackSpeed:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* 时间回溯信息显示样式 */
+#currentTimelineInfo {
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+  min-width: 120px;
+}
+
+#totalTimelineInfo {
+  color: #94a3b8;
+  font-size: 0.8em;
+}
+
+/* 重置按钮样式 */
+#resetTimelineBtn {
+  transition: all 0.2s ease;
+}
+
+#resetTimelineBtn:hover {
+  background-color: #374151;
+  transform: translateY(-1px);
+}
+
