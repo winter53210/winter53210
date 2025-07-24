@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>城市记忆平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 使用传统百度地图API -->
+  <script src="https://api.map.baidu.com/api?v=3.0&ak=3eSqPr2aETN3I7Ug0hY9hcLSFUZJaxIT"></script>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Leaflet 地图 & 热力图 -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+<!-- WordCloud2 -->
+<script src="https://cdn.jsdelivr.net/npm/wordcloud@1.1.2/src/wordcloud2.js"></script>
+
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- 通知容器 -->
+  <div id="notificationContainer"></div>
+
+  <!-- 离线指示器 -->
+  <div id="offlineIndicator" class="offline-indicator hidden">
+    ⚠️ 网络连接断开，正在尝试重连...
+  </div>
+
+  <!-- 登录注册页面 -->
+  <div id="authPage" class="min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-md fade-in">
+      <div class="text-center p-8 pb-4">
+        <div class="mb-4">
+          <span class="text-4xl">🏙️</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">城市记忆</h1>
+        <p class="text-gray-600">记录您在城市中的美好时光</p>
+      </div>
+
+      <!-- 登录表单 -->
+      <div id="loginForm" class="p-8 pt-4">
+        <h2 class="text-xl font-semibold text-center mb-6 text-gray-700">登录您的账户</h2>
+        
+        <form class="space-y-4" onsubmit="handleLogin(event)">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+            <input type="text" id="loginUsername" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="请输入用户名" required>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+            <input type="password" id="loginPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="请输入密码" required>
+          </div>
+          
+          <button type="submit" id="loginSubmitBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200">
+            登录
+          </button>
+        </form>
+        
+        <div class="mt-6 text-center">
+          <p class="text-sm text-gray-600">
+            还没有账户？
+            <button onclick="showRegisterForm()" class="text-blue-500 hover:text-blue-600 font-medium">立即注册</button>
+          </p>
+        </div>
+      </div>
+
+      <!-- 注册表单 -->
+      <div id="registerForm" class="p-8 pt-4 hidden">
+        <h2 class="text-xl font-semibold text-center mb-6 text-gray-700">创建新账户</h2>
+        
+        <form class="space-y-4" onsubmit="handleRegister(event)">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+            <input type="text" id="registerUsername" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="请输入用户名" required>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+            <input type="password" id="registerPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="请输入密码" required>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">确认密码</label>
+            <input type="password" id="confirmPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="请再次输入密码" required>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">邮箱 (可选)</label>
+            <input type="email" id="registerEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="请输入邮箱地址">
+          </div>
+          
+          <button type="submit" id="registerSubmitBtn" class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200">
+            注册并登录
+          </button>
+        </form>
+        
+        <div class="mt-6 text-center">
+          <p class="text-sm text-gray-600">
+            已有账户？
+            <button onclick="showLoginForm()" class="text-blue-500 hover:text-blue-600 font-medium">立即登录</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主应用页面 -->
+  <div id="mainApp" class="hidden">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-white shadow p-4 flex justify-between items-center">
+      <div class="text-xl font-bold flex items-center">
+        <span class="mr-2">🏙️</span>
+        <span>城市记忆</span>
+        <span id="storageStatus" class="ml-3 px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">🗺️ 传统地图版本</span>
+      </div>
+      <div class="space-x-4">
+        <button onclick="showView('home')" class="nav-btn hover:text-blue-600 text-blue-600 font-medium">首页</button>
+        <button onclick="showView('mymemories')" class="nav-btn hover:text-blue-600">我的记忆</button>
+        <button onclick="showView('heatmap')" class="nav-btn hover:text-blue-600">热力图</button>
+        <button onclick="showView('wordcloud')" class="nav-btn hover:text-blue-600">关键词云</button>
+        <button onclick="showView('timeline')" class="nav-btn hover:text-blue-600">时间回溯</button>
+        <button onclick="showView('rankinglist')" class="nav-btn hover:text-blue-600">记忆排行榜</button>    
+      </div>
+      <div class="space-x-2 flex items-center">
+        <span id="currentUser" class="text-sm text-gray-600"></span>
+        <button onclick="handleLogout()" class="text-sm border rounded px-2 py-1 bg-red-100 hover:bg-red-200">退出登录</button>
+        <input type="file" id="importFileInput" accept=".json" style="display: none;">
+      </div>
+    </nav>
+
+    <!-- 主体区域 -->
+    <div class="flex h-[calc(100vh-64px)]">
+
+      <!-- 左侧功能栏 -->
+      <aside class="w-64 bg-white shadow p-4 space-y-4">
+        <h2 class="font-semibold text-lg">筛选浏览</h2>
+        <div>
+          <label class="text-sm font-medium text-gray-700">情绪：</label>
+          <div class="grid grid-cols-2 gap-1 mt-1">
+            <button class="filter-emotion-btn p-2 rounded border hover:bg-gray-100 text-center" data-emotion="开心" title="开心">😀 开心</button>
+            <button class="filter-emotion-btn p-2 rounded border hover:bg-gray-100 text-center" data-emotion="难过" title="难过">😢 难过</button>
+            <button class="filter-emotion-btn p-2 rounded border hover:bg-gray-100 text-center" data-emotion="生气" title="生气">😡 生气</button>
+            <button class="filter-emotion-btn p-2 rounded border hover:bg-gray-100 text-center" data-emotion="喜欢" title="喜欢">❤️ 喜欢</button>
+            <button class="filter-emotion-btn p-2 rounded border hover:bg-gray-100 text-center" data-emotion="平静" title="平静">😐 平静</button>
+            <button class="filter-emotion-btn p-2 rounded border hover:bg-gray-100 text-center" data-emotion="兴奋" title="兴奋">🤩 兴奋</button>
+          </div>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-700">主题：</label>
+          <select id="filter-theme" class="w-full border rounded mt-1 px-2 py-1">
+            <option value="">全部主题</option>
+            <option value="旅游">🌍 旅游</option>
+            <option value="童年记忆">👶 童年记忆</option>
+            <option value="恋爱">💕 恋爱</option>
+            <option value="工作">💼 工作</option>
+            <option value="学习">📚 学习</option>
+            <option value="美食">🍔 美食</option>
+            <option value="朋友">👥 朋友</option>
+            <option value="运动">🏃 运动</option>
+            <option value="娱乐">🎬 娱乐</option>
+            <option value="自然景观">🏔️ 自然景观</option>
+            <option value="人文景观">🏛️ 人文景观</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-700">时间段：</label>
+          <input type="date" id="filter-start-date" class="w-full border rounded mt-1 px-2 py-1 text-sm">
+          <input type="date" id="filter-end-date" class="w-full border rounded mt-1 mt-2 px-2 py-1 text-sm">
+        </div>
+        <button onclick="applyFilters()" class="w-full bg-blue-500 text-white py-2 mt-2 rounded hover:bg-blue-600 transition duration-200">🔍 应用筛选</button>
+        <button onclick="clearFilters()" class="w-full bg-gray-200 text-gray-700 py-1 mt-1 rounded hover:bg-gray-300 transition duration-200 text-sm">清除筛选</button>
+        <hr>
+        <div class="text-xs text-gray-500 space-y-1">
+          <div class="flex justify-between">
+            <span>记忆总数:</span>
+            <span id="totalMemoriesCount" class="font-medium">0</span>
+          </div>
+          <div class="flex justify-between">
+            <span>显示中:</span>
+            <span id="displayedMemoriesCount" class="font-medium">0</span>
+          </div>
+          <div class="flex justify-between">
+            <span>当前页面:</span>
+            <span id="currentPageType" class="font-medium text-blue-600">全部记忆</span>
+          </div>
+          <div class="flex justify-between">
+            <span>当前用户:</span>
+            <span id="sidebarCurrentUser" class="font-medium text-blue-600">-</span>
+          </div>
+          <div class="flex justify-between">
+            <span>连接状态:</span>
+            <span id="connectionStatus" class="font-medium text-green-600">已连接</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 地图与操作区 -->
+      <main class="flex-1 relative">
+        <!-- 地图控制面板 -->
+        <div class="map-controls">
+          <!-- 地图模式选择器 -->
+          <div class="map-mode-selector">
+            <button class="map-mode-btn active" data-mode="normal" onclick="switchMapMode('normal')">
+              🗺️ 普通地图
+            </button>
+            <button class="map-mode-btn" data-mode="satellite" onclick="switchMapMode('satellite')">
+              🛰️ 卫星地图
+            </button>
+          </div>
+
+          <!-- 控制按钮 -->
+          <button id="locateBtn" class="map-control-btn" onclick="locateUser()">
+            🧭 定位
+          </button>
+          
+          <button id="centerMapBtn" class="map-control-btn" onclick="centerMap()">
+            🌍 回到中心
+          </button>
+          
+          <button id="createMemoryBtn" class="map-control-btn" onclick="toggleCreateMode()">
+            ➕ 创建记忆点
+          </button>
+        </div>
+
+        <div id="map" class="h-full w-full"></div>
+         <div id="visualizationViews" class="absolute inset-0 bg-white overflow-hidden hidden z-10 p-0 space-y-6">
+      <!--热力图-->
+      <div id="heatmapContainer" class="hidden h-full">
+        <div id="heatmapMap" class="w-full h-full"></div>
+      </div>
+      <!--关键词云-->
+        <div id="wordcloudContainer" style="width: 100%; height: 100%;">
+  <canvas id="wordCloudCanvas" style="width: 100%; height: 100%; display: block;"></canvas>
+        </div>
+         <!-- ✅ 排行榜视图：加入这里 -->
+<div id="rankingListContainer" class="hidden p-6 overflow-y-auto h-full">
+  <h2 class="text-2xl font-bold mb-4">🏆 记忆排行榜</h2>
+  <div id="rankingList" class="space-y-4"></div>
+</div>
+      <!-- 时间回溯容器 -->
+        <div id="timelineContainer" class="hidden flex flex-col h-full">
+        <!-- 地图区域：占据除底部控件外的所有空间 -->
+          <div id="timelineMap" class="w-full flex-grow rounded border"></div>
+        <!-- 播放控件区域：固定在底部 -->
+          <div class="w-full bg-white border-t px-4 py-2 mb-[40px] flex items-center space-x-4">
+          <button id="playPauseBtn" onclick="togglePlay()" class="bg-blue-500 text-white px-4 py-2 rounded">▶️ 播放</button>
+          <input type="range" id="timelineSlider" min="0" max="100" value="0" class="flex-grow">
+          </div>
+        </div>
+      </div>
+      </div>
+      </main>
+    </div>
+  </div>
+
+
+  <!-- 创建/编辑记忆点模态框 -->
+  <div id="createMemoryModal" class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center hidden z-50">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-[450px] max-h-[90vh] overflow-y-auto">
+      <h3 id="modalTitle" class="text-lg font-bold mb-4 text-gray-800">✨ 创建记忆点</h3>
+
+      <form onsubmit="handleSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">标题：</label>
+          <input type="text" id="mem-title" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="请输入记忆标题" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">主题：</label>
+          <select id="mem-theme" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+            <option value="">请选择主题</option>
+            <option value="旅游">🌍 旅游</option>
+            <option value="童年记忆">👶 童年记忆</option>
+            <option value="恋爱">💕 恋爱</option>
+            <option value="工作">💼 工作</option>
+            <option value="学习">📚 学习</option>
+            <option value="美食">🍔 美食</option>
+            <option value="朋友">👥 朋友</option>
+            <option value="运动">🏃 运动</option>
+            <option value="娱乐">🎬 娱乐</option>
+            <option value="自然景观">🏔️ 自然景观</option>
+            <option value="人文景观">🏛️ 人文景观</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">心情：</label>
+          <div id="emotion-options" class="grid grid-cols-3 gap-2">
+            <button type="button" class="emotion-btn text-lg px-3 py-2 rounded border hover:border-blue-500 transition duration-200 text-center" data-value="开心" title="开心">😀<br><span class="text-xs">开心</span></button>
+            <button type="button" class="emotion-btn text-lg px-3 py-2 rounded border hover:border-blue-500 transition duration-200 text-center" data-value="难过" title="难过">😢<br><span class="text-xs">难过</span></button>
+            <button type="button" class="emotion-btn text-lg px-3 py-2 rounded border hover:border-blue-500 transition duration-200 text-center" data-value="生气" title="生气">😡<br><span class="text-xs">生气</span></button>
+            <button type="button" class="emotion-btn text-lg px-3 py-2 rounded border hover:border-blue-500 transition duration-200 text-center" data-value="喜欢" title="喜欢">❤️<br><span class="text-xs">喜欢</span></button>
+            <button type="button" class="emotion-btn text-lg px-3 py-2 rounded border hover:border-blue-500 transition duration-200 text-center" data-value="平静" title="平静">😐<br><span class="text-xs">平静</span></button>
+            <button type="button" class="emotion-btn text-lg px-3 py-2 rounded border hover:border-blue-500 transition duration-200 text-center" data-value="兴奋" title="兴奋">🤩<br><span class="text-xs">兴奋</span></button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">描述：</label>
+          <textarea id="mem-desc" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3" placeholder="请描述这个记忆的详细内容..."></textarea>
+        </div>
+
+        <!-- 图片上传 -->
+        <!-- <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">添加图片：</label>
+          <div class="space-y-2">
+            <input type="file" id="mem-images" accept="image/*" multiple class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <div id="image-preview" class="flex flex-wrap gap-2"></div>
+            <p class="text-xs text-gray-500">支持多张图片上传，每张图片不超过5MB</p>
+          </div>
+        </div> -->
+
+        <!-- 可见性设置 -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">可见性设置：</label>
+          <div class="flex items-center space-x-4">
+            <label class="flex items-center cursor-pointer">
+              <input type="radio" name="privacy" value="public" class="mr-2" checked>
+              <span class="text-sm">🌍 公开（所有人可见）</span>
+            </label>
+            <label class="flex items-center cursor-pointer">
+              <input type="radio" name="privacy" value="private" class="mr-2">
+              <span class="text-sm">🔒 私密（仅自己可见）</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">日期：</label>
+          <input type="date" id="mem-date" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-4">
+          <button type="button" onclick="hideModal()" class="px-4 py-2 rounded border bg-gray-100 hover:bg-gray-200 transition duration-200">取消</button>
+          <button type="submit" id="submitBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200">✅ 确定创建</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 记忆详情模态框 -->
+  <div id="memoryDetailModal" class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center hidden z-50">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-[500px] max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-gray-800">📝 记忆详情</h3>
+        <button onclick="hideMemoryDetail()" class="text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+      </div>
+      <div id="memoryDetailContent">
+        <!-- 动态填充内容 -->
+      </div>
+      <div id="memoryDetailActions" class="flex justify-end space-x-3 pt-4">
+        <button onclick="editMemory()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200">✏️ 编辑</button>
+        <button onclick="deleteMemory()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200">🗑️ 删除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 图片预览模态框 -->
+  <div id="imageModal" class="image-modal hidden">
+    <span class="close-modal" onclick="closeImageModal()">&times;</span>
+    <img id="modalImage" src="" alt="图片预览">
+  </div>
+  <script src="js/app.js"></script> 
+  <script src="js/function.js"></script>
+</body>
+</html>
